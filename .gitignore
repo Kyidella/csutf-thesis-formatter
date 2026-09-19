@@ -1,0 +1,23 @@
+# 打包产物
+build/
+dist/
+*.spec
+
+# 运行产物
+out/
+*.part
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# 真实论文样本：含姓名与未发表内容，绝不入库。
+# 回归测试要用它们时，自己放在 ../论文/ 下即可（文件不在会自动跳过）。
+论文/
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini

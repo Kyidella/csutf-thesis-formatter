@@ -1,0 +1,15 @@
+# 图形界面的依赖（命令行部分只需要 lxml + PyYAML，已在环境里）
+#
+# 装：python -m pip install -r requirements-gui.txt
+# 打包：python build_exe.py
+#
+# 直连 PyPI 很慢的话（实测 140 KB/s，PySide6 加起来 200MB+），换国内镜像：
+#   python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements-gui.txt
+#
+# 一个坑：同时跑两个 pip 装同一个包会写坏 site-packages。
+# 要重来就先确认没有别的 pip 在跑。
+#
+# 版本是本机实测通过的：Python 3.14.6 / Windows 10。
+# PySide6 走的是 cp310-abi3 稳定 ABI 轮子，所以 3.10 以上都能装。
+PySide6==6.11.2
+pyinstaller==6.22.3

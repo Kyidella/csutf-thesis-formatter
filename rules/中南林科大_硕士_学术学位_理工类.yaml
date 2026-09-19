@@ -1,0 +1,761 @@
+# 中南林业科技大学 硕士学位论文（学术学位 · 理工类）格式规则
+#
+# 来源：学校 2026-04-23 版模板 word/comments.xml 中的 39 条批注（规范正文）
+#       + 模板正文的直接格式（用于交叉校验字号映射，已逐条核对一致）
+#
+# 字号换算：初42 小初36 一26 小一24 二22 小二18 三16 小三15 四14 小四12 五10.5 小五9
+# 规范未覆盖的项，回退到 2025 年已通过答辩的样本（见 fallback 段）。
+
+meta:
+  school: 中南林业科技大学
+  degree: 硕士
+  degree_type: 学术学位
+  discipline: 理工类
+  template: 中南林科大_硕士_学术学位_理工类.docx
+  spec_date: "2026-04-23"
+  spec_source: word/comments.xml
+
+page:
+  size: A4
+  width_mm: 210
+  height_mm: 297
+  margins_cm: { top: 2.5, bottom: 2.5, left: 3.0, right: 2.5 }
+  header_margin_cm: 1.5
+  footer_margin_cm: 1.5
+
+# 页码：前置部分（摘要→目录）大写罗马数字，正文（绪论→文末）阿拉伯数字重新从 1 开始
+# 前两条 formatter.plan_numbering 会读；其余几条尚未实现，见文件末尾 not_implemented。
+pagination:
+  front_matter: { num_fmt: upperRoman, restart_at: 1 }
+  body:         { num_fmt: decimal,    restart_at: 1 }
+  position: bottom-center
+  font_en: Times New Roman
+  size_pt: 9.0          # 小五
+  decorate: none        # 页码两侧不加修饰线
+
+# ---------------------------------------------------------------------------
+# 样式规则
+#   font_cn/font_en  中/西文字体
+#   size_pt          字号（pt）
+#   bold             加粗。**写了才会去动**：true 强制加粗，false 强制不加粗。
+#                    必须给标题写上 false——Word 内置的 heading 2/3/4 自带加粗，
+#                    不管它的话，我们把字体改成黑体反而叠了一层粗，比原稿还难看。
+#   outline_level    大纲级别；null = 正文文本
+#   line_spacing     {type: single|multiple|exact, value: <磅或倍数>}
+#   space_*          段前/段后；{lines: n} 或 {pt: n}
+# ---------------------------------------------------------------------------
+styles:
+
+  # ---- 封面 ----
+  cover_classification:
+    desc: 分类号、密级
+    font_cn: 宋体
+    font_en: Times New Roman
+    size_pt: 12.0            # 小四
+    align: both
+    indent: {first_line_chars: 0, left_chars: 0, right_chars: 0}
+    space_before: {lines: 1}
+    space_after: {lines: 0}
+    line_spacing: {type: multiple, value: 1.2}
+
+  cover_school_code:
+    desc: 学校代号、学号
+    font_cn: 宋体
+    font_en: Times New Roman
+    size_pt: 12.0
+    align: both
+    indent: {first_line_chars: 0, left_chars: 0, right_chars: 0}
+    space_before: {pt: 10}
+    space_after: {pt: 0}
+    line_spacing: {type: multiple, value: 1.2}
+
+  cover_degree_label:
+    desc: 硕士学位论文
+    font_cn: 黑体
+    font_en: null
+    size_pt: 26.0            # 一号
+    align: center
+    indent: {first_line_chars: 0}
+    space_before: {lines: 1}
+    space_after: {lines: 0}
+    line_spacing: {type: single}
+
+  cover_title:
+    desc: 题目
+    font_cn: 宋体
+    font_en: Times New Roman
+    size_pt: 24.0            # 小一
+    align: center
+    indent: {first_line_chars: 0}
+    space_before: {pt: 0}
+    space_after: {pt: 0}
+    line_spacing: {type: single}
+    max_chars: 25
+    note: 应位于横线中间部分
+
+  cover_subtitle:
+    desc: 副标题
+    font_cn: 宋体
+    font_en: Times New Roman
+    size_pt: 18.0            # 小二
+    align: center
+    indent: {first_line_chars: 0}
+    space_before: {pt: 0}
+    space_after: {pt: 0}
+    line_spacing: {type: single}
+
+  cover_fields:
+    desc: 封面填写内容（作者姓名/导师/学院/学科/方向/日期）
+    font_cn: 楷体
+    font_en: Times New Roman
+    size_pt: 14.0            # 四号
+    align: left
+    indent: {first_line_chars: 6}
+    space_before: {pt: 0}
+    space_after: {pt: 0}
+    line_spacing: {type: exact, value: 25.0}
+
+  cover_en_title:
+    desc: 英文题目
+    font_cn: 宋体
+    font_en: Times New Roman
+    size_pt: 15.0            # 小三
+    align: center
+    indent: {first_line_chars: 0}
+    space_before: {pt: 0}
+    space_after: {pt: 0}
+    line_spacing: {type: multiple, value: 1.6}
+    note: 每个实词首字母大写
+
+  cover_en_field:
+    desc: 作者英文姓名 / 学科门类 / Supervisor
+    font_cn: 宋体
+    font_en: Times New Roman
+    size_pt: 14.0            # 四号
+    align: center
+    indent: {first_line_chars: 0}
+    space_before: {pt: 0}
+    space_after: {pt: 0}
+    line_spacing: {type: multiple, value: 1.5}
+    examples: [王五一 WANG Wuyi, 张三 ZHANG San, Agronomy（农学）]
+
+  cover_date:
+    desc: 日期
+    font_cn: 宋体
+    font_en: Times New Roman
+    size_pt: 14.0
+    align: center
+    indent: {first_line_chars: 0}
+    space_before: {pt: 0}
+    space_after: {pt: 0}
+    line_spacing: {type: single}
+
+  # ---- 摘要 ----
+  abstract_title:
+    desc: 摘要（两字间空 2 格）
+    new_page: true
+    font_cn: 黑体
+    font_en: Times New Roman
+    size_pt: 18.0            # 小二
+    outline_level: 1
+    align: center
+    indent: {first_line_chars: 0, left_chars: 0, right_chars: 0}
+    space_before: {lines: 0}
+    space_after: {lines: 0}
+    line_spacing: {type: exact, value: 20.0}
+    blank_line_after: true
+
+  abstract_body:
+    desc: 中文摘要内容
+    font_cn: 宋体
+    font_en: Times New Roman
+    size_pt: 12.0            # 小四
+    outline_level: null
+    align: both
+    indent: {first_line_chars: 2, left_chars: 0, right_chars: 0}
+    space_before: {lines: 0}
+    space_after: {lines: 0}
+    line_spacing: {type: exact, value: 20.0}
+    word_count: 800
+
+  abstract_keywords:
+    desc: 关键词
+    font_cn: 黑体
+    font_en: Times New Roman
+    size_pt: 12.0
+    outline_level: null
+    align: both
+    indent: {first_line_chars: 0, left_chars: 0, right_chars: 0}
+    space_before: {lines: 0}
+    space_after: {lines: 0}
+    line_spacing: {type: exact, value: 20.0}
+    label: "关键词："
+    label_font: 黑体
+    separator: "；"          # 全角分号，最后一个词后不加标点
+    count_range: [3, 8]
+    blank_line_before: true
+
+  abstract_en_title:
+    desc: ABSTRACT
+    new_page: true
+    font_cn: null
+    font_en: Times New Roman
+    size_pt: 18.0
+    bold: true
+    outline_level: 1
+    align: center
+    indent: {first_line_chars: 0}
+    space_before: {lines: 0}
+    space_after: {lines: 0}
+    line_spacing: {type: exact, value: 20.0}
+    blank_line_after: true
+
+  abstract_en_body:
+    desc: 英文摘要内容
+    font_cn: 宋体
+    font_en: Times New Roman
+    size_pt: 12.0
+    outline_level: null
+    align: both
+    indent: {first_line_chars: 2}
+    space_before: {lines: 0}
+    space_after: {lines: 0}
+    line_spacing: {type: exact, value: 20.0}
+    note: 英文标点符号后应有一个半角空格
+
+  abstract_en_keywords:
+    desc: Keywords
+    font_cn: null
+    font_en: Times New Roman
+    size_pt: 12.0
+    outline_level: null
+    align: both
+    indent: {first_line_chars: 0, left_chars: 0, right_chars: 0}
+    space_before: {lines: 0}
+    space_after: {lines: 0}
+    line_spacing: {type: exact, value: 20.0}
+    label: "Keywords:"
+    label_bold: true
+    separator: ";"           # 半角分号
+    blank_line_before: true
+
+  # ---- 目录 ----
+  toc_title:
+    desc: 目录（两字间空 2 格）
+    new_page: true
+    font_cn: 黑体
+    font_en: null
+    size_pt: 16.0            # 三号
+    outline_level: null
+    align: center
+    indent: {first_line_chars: 0}
+    space_before: {pt: 0}
+    space_after: {pt: 0}
+    line_spacing: {type: single}
+    max_depth: 3
+
+  toc_entry_front:
+    desc: 前置部分条目（摘要、ABSTRACT）
+    font_cn: 黑体
+    font_en: Times New Roman
+    size_pt: 12.0            # 小四
+    align: both
+    indent: {first_line_chars: 0, left_chars: 0, right_chars: 0}
+    line_spacing: {type: exact, value: 20.0}
+
+  toc_entry_1:
+    desc: 一级目录项
+    font_cn: 黑体
+    font_en: Times New Roman
+    size_pt: 14.0            # 四号
+    align: both
+    indent: {first_line_chars: 0, left_chars: 0, right_chars: 0}
+    line_spacing: {type: exact, value: 20.0}
+
+  toc_entry_2:
+    desc: 二级目录项
+    font_cn: 宋体
+    font_en: Times New Roman
+    size_pt: 12.0
+    align: both
+    indent: {first_line_chars: 0, left_chars: 1, right_chars: 0}
+    line_spacing: {type: exact, value: 20.0}
+
+  toc_entry_3:
+    desc: 三级目录项
+    font_cn: 宋体
+    font_en: Times New Roman
+    size_pt: 12.0
+    align: both
+    indent: {first_line_chars: 0, left_chars: 2, right_chars: 0}
+    line_spacing: {type: exact, value: 20.0}
+
+  toc_common:
+    desc: 目录通用要求
+    page_number_align: right
+    leader: dot
+    note: 正文修改后注意刷新目录保持一致
+
+  # ---- 正文标题 ----
+  heading1:
+    desc: 一级标题
+    new_page: true
+    font_cn: 黑体
+    font_en: Times New Roman
+    size_pt: 16.0            # 三号
+    bold: false              # 规范只写"黑体"，黑体本身就重，不叠加加粗
+    outline_level: 1
+    align: both
+    indent: {first_line_chars: 0}
+    space_before: {lines: 1}
+    space_after: {lines: 1}
+    line_spacing: {type: single}
+    number_gap: "  "         # 序号和标题间空 2 格
+    number_style: arabic     # 模板正文实例为 "1  绪论"
+
+  heading2:
+    desc: 二级标题
+    font_cn: 黑体
+    font_en: Times New Roman
+    size_pt: 15.0            # 小三
+    bold: false
+    outline_level: 2
+    align: both
+    indent: {first_line_chars: 0}
+    space_before: {pt: 12}
+    space_after: {pt: 12}
+    line_spacing: {type: single}
+    number_gap: "  "
+
+  heading3:
+    desc: 三级标题
+    font_cn: 黑体
+    font_en: Times New Roman
+    size_pt: 14.0            # 四号
+    bold: false
+    outline_level: 3
+    align: both
+    indent: {first_line_chars: 0}
+    space_before: {pt: 6}
+    space_after: {pt: 6}
+    line_spacing: {type: single}
+    number_gap: "  "
+
+  heading4:
+    desc: 四级标题
+    font_cn: 黑体
+    font_en: Times New Roman
+    size_pt: 12.0            # 小四
+    bold: false
+    outline_level: 4
+    align: both
+    indent: {first_line_chars: 0}
+    space_before: {pt: 6}
+    space_after: {pt: 6}
+    line_spacing: {type: single}
+    number_gap: "  "
+
+  # ---- 正文 ----
+  body:
+    desc: 正文
+    font_cn: 宋体
+    font_en: Times New Roman
+    size_pt: 12.0            # 小四
+    outline_level: null
+    align: both
+    indent: {first_line_chars: 2, left_chars: 0, right_chars: 0}
+    space_before: {lines: 0}
+    space_after: {lines: 0}
+    line_spacing: {type: exact, value: 20.0}
+
+  footnote:
+    desc: 脚注
+    font_cn: 宋体
+    font_en: Times New Roman
+    size_pt: 9.0             # 小五
+    align: left
+    indent: {first_line_chars: 0}
+    space_before: {lines: 0}
+    space_after: {lines: 0}
+    line_spacing: {type: single}
+    marker_style: circled    # ①②③……，每页重新编号
+
+  citation:
+    desc: 正文中引用文献标注
+    format: "[n]"            # 阿拉伯数字前后加中括号
+    font_en: Times New Roman
+    size_pt: 12.0
+    superscript: true
+
+  equation:
+    desc: 公式
+    numbering: chapter       # 分章编号，如 (1.1)
+    number_align: right
+    wrap: parentheses
+    line_spacing: {type: multiple, value: 1.5}
+    space_before: {pt: 6}
+    space_after: {pt: 6}
+
+  # ---- 图 ----
+  figure_caption:
+    desc: 图题（位于图片正下方）
+    font_cn: 宋体
+    font_en: Times New Roman
+    size_pt: 10.5            # 五号
+    align: center
+    indent: {first_line_chars: 0, left_chars: 0, right_chars: 0}
+    space_before: {lines: 0}
+    space_after: {lines: 0}
+    line_spacing: {type: exact, value: 20.0}
+    numbering: chapter       # 图1.1 / 图2.2 / 图n.n
+    gap_after_number: 1      # 图号后空 1 个空格
+    note: 图名中不使用标点，图名后不加标点；图片以嵌入式插入并居中
+
+  figure_note:
+    desc: 图注 / 图片来源说明（位于图题之下）
+    font_cn: 宋体
+    font_en: Times New Roman
+    size_pt: 9.0             # 小五
+    align: center
+    indent: {first_line_chars: 0}
+    space_before: {pt: 0}
+    space_after: {pt: 0}
+    line_spacing: {type: single}
+
+  subfigure:
+    desc: 分图
+    numbering: "a) b) c)…"
+    note: 分图名列在各分图正下方，主图名列在所有分图下方正中
+
+  # ---- 表 ----
+  table_caption:
+    desc: 表题（位于表格正上方）
+    font_cn: 宋体
+    font_en: Times New Roman
+    size_pt: 10.5            # 五号
+    align: center
+    indent: {first_line_chars: 0, left_chars: 0, right_chars: 0}
+    space_before: {lines: 0}
+    space_after: {lines: 0}
+    line_spacing: {type: exact, value: 20.0}
+    numbering: chapter       # 表1.1
+    gap_after_number: 1
+    note: 表格居中；表名中不使用标点，表名后不加标点
+
+  table_note:
+    desc: 表注 / 数据来源说明
+    font_cn: 宋体
+    font_en: Times New Roman
+    size_pt: 9.0
+    align: both
+    indent: {first_line_chars: 2}
+    space_before: {pt: 0}
+    space_after: {pt: 0}
+    line_spacing: {type: single}
+
+  table_continued:
+    desc: 续表
+    format: "续表2.1 XXXX"
+    note: 转页接排时重复表编号，且续表均须重复表头
+
+  # ---- 文末 ----
+  reference_title:
+    desc: 参考文献标题
+    new_page: true
+    font_cn: 黑体
+    font_en: Times New Roman
+    size_pt: 16.0            # 三号
+    outline_level: 1
+    align: center
+    indent: {first_line_chars: 0, left_chars: 0, right_chars: 0}
+    space_before: {lines: 0}
+    space_after: {lines: 0}
+    line_spacing: {type: exact, value: 20.0}
+    blank_line_after: true
+
+  reference_item:
+    desc: 参考文献内容
+    font_cn: 宋体
+    font_en: Times New Roman
+    size_pt: 12.0
+    align: both
+    indent: {first_line_chars: 0, left_chars: 0, right_chars: 0, hanging: false}
+    space_before: {lines: 0}
+    space_after: {lines: 0}
+    line_spacing: {type: exact, value: 20.0}
+    gap_after_number: 1      # 编号与内容间空 1 格
+
+  appendix_title:
+    desc: 附录标题
+    new_page: true
+    font_cn: 黑体
+    font_en: Times New Roman
+    size_pt: 16.0
+    outline_level: 1
+    align: center
+    indent: {first_line_chars: 0, left_chars: 0, right_chars: 0}
+    line_spacing: {type: exact, value: 20.0}
+    blank_line_after: true
+
+  ack_title:
+    desc: 致谢标题（两字间空 2 格）
+    new_page: true
+    font_cn: 黑体
+    font_en: Times New Roman
+    size_pt: 16.0
+    outline_level: 1
+    align: center
+    indent: {first_line_chars: 0, left_chars: 0, right_chars: 0}
+    line_spacing: {type: exact, value: 20.0}
+    blank_line_after: true
+    note: 致谢两字中间空 2 格
+
+  ack_body:
+    desc: 致谢文本
+    font_cn: 宋体
+    font_en: Times New Roman
+    size_pt: 12.0
+    align: both
+    indent: {first_line_chars: 2, left_chars: 0, right_chars: 0}
+    space_before: {lines: 0}
+    space_after: {lines: 0}
+    line_spacing: {type: exact, value: 20.0}
+
+# ---------------------------------------------------------------------------
+# 类型 → Word 样式名
+# 分类器输出的是左列的类型键；格式化器要把它落到具体的 Word 样式上。
+#   builtin: true  → 文档里一般已经有这个内置样式，找不到就新建
+#   builtin: false → 非内置样式（如"摘要正文"），按 name 新建
+# 样式名用中文：学生打开文档时在样式面板里看到的是中文名，比"Body Text 2"易懂。
+# ---------------------------------------------------------------------------
+word_styles:
+  # Word 内置样式的 w:name 存的是英文规范名（"heading 1"），
+  # 界面上显示的"标题 1"是 Word 自己翻译的，两者不能混。
+  # 用中文名去找会匹配不到，进而给文档新建一套重复样式。
+  heading1:            { name: "heading 1",     builtin: true }
+  heading2:            { name: "heading 2",     builtin: true }
+  heading3:            { name: "heading 3",     builtin: true }
+  heading4:            { name: "heading 4",     builtin: true }
+  # 正文不映射到 Normal：Normal 是所有段落的祖先，写进去会波及目录项、
+  # 图题、参考文献等一切继承它的段落。正文要独立成一个样式。
+  body:                { name: "论文正文",      builtin: false }
+  abstract_title:      { name: "摘要标题",      builtin: false }
+  abstract_body:       { name: "摘要正文",      builtin: false }
+  abstract_keywords:   { name: "摘要关键词",    builtin: false }
+  abstract_en_title:   { name: "ABSTRACT 标题", builtin: false }
+  abstract_en_body:    { name: "ABSTRACT 正文", builtin: false }
+  abstract_en_keywords: { name: "Keywords",     builtin: false }
+  toc_title:           { name: "目录标题",      builtin: false }
+  toc_entry_front:     { name: "目录项-前置",   builtin: false }
+  toc_entry_1:         { name: "目录项-一级",   builtin: false }
+  toc_entry_2:         { name: "目录项-二级",   builtin: false }
+  toc_entry_3:         { name: "目录项-三级",   builtin: false }
+  figure_caption:      { name: "图题",          builtin: false }
+  figure_note:         { name: "图注",          builtin: false }
+  table_caption:       { name: "表题",          builtin: false }
+  table_note:          { name: "表注",          builtin: false }
+  table_continued:     { name: "续表题",        builtin: false }
+  reference_title:     { name: "参考文献标题",  builtin: false }
+  reference_item:      { name: "参考文献条目",  builtin: false }
+  appendix_title:      { name: "附录标题",      builtin: false }
+  ack_title:           { name: "致谢标题",      builtin: false }
+  ack_body:            { name: "致谢正文",      builtin: false }
+
+# ---------------------------------------------------------------------------
+# 异常字符
+# 39 条批注规范里没有覆盖。下面这些是"清洗"性质的条目：
+#   - 不换行空格/零宽字符：AI 生成文本的常见痕迹，规范要求西文用半角空格
+#   - 私有区字符：WPS 等软件留下的垃圾，在任何字体下都可能显示成空框
+#   - 同义字符混用：如 µ(U+00B5) 与 μ(U+03BC) 都是"微"，同一篇里应统一
+# 注意：制表符、℃、外国人名重音字母、罗马数字、勾选框都是正常用法，不报。
+#
+# scope 说明每个条目配一个 fix 处置，格式化器照此执行：
+#   fix: space   换成半角空格
+#   fix: delete  删掉
+#   fix: report  只报告不自动改（默认值）
+# 替换字符（U+FFFD）故意用 report：它代表"这里原本有个字但转换失败了"，
+# 自动删掉等于把线索也删了，得让人回去看原稿。
+#
+# **区间按先后顺序匹配，先命中的生效**，所以特例要写在通用区间之前。
+# ---------------------------------------------------------------------------
+characters:
+  enabled: true
+  bad:
+    # U+E5E5 是个例外：它在样本里被当空格用。
+    # 证据：某样本论文的六个一级标题里，第二~六章都在序号后有一个真空格，
+    # 只有第一章那个位置是它。删掉它，第一章就成了唯一没有间隔的标题，
+    # 所以改成换半角空格。其余私有区字符照删。
+    - { range: [0xE5E5, 0xE5E5], name: "私有区空格 U+E5E5", note: "样本里顶替空格用，换成半角空格", fix: space }
+    - { range: [0x00A0, 0x00A0], name: "不换行空格 NBSP", note: "AI 生成痕迹；西文应用半角空格", fix: space }
+    - { range: [0x2000, 0x200A], name: "异常空格", note: "各种宽度的空格，应改为半角空格", fix: space }
+    - { range: [0x200B, 0x200B], name: "零宽空格", note: "不可见字符，会影响检索与排版", fix: delete }
+    - { range: [0x200C, 0x200D], name: "零宽连接符", note: "不可见字符", fix: delete }
+    - { range: [0x202F, 0x202F], name: "窄不换行空格", note: "应改为半角空格", fix: space }
+    - { range: [0x2060, 0x2060], name: "词连接符", note: "不可见字符", fix: delete }
+    - { range: [0xFEFF, 0xFEFF], name: "零宽不换行空格", note: "常由复制粘贴带入", fix: delete }
+    - { range: [0xE000, 0xF8FF], name: "私有区字符", note: "WPS 等软件留下的垃圾，删掉即可", fix: delete }
+    - { range: [0xFFFD, 0xFFFD], name: "替换字符", note: "编码转换失败的残留，需回原稿核对", fix: report }
+  # 同义字符：同一篇里只应出现一种
+  synonyms:
+    - name: "微符号 µ / 希腊字母 μ"
+      group: ["µ", "μ"]          # U+00B5 / U+03BC
+      prefer: "μ"
+
+# ---------------------------------------------------------------------------
+# 标点全角/半角
+# 39 条批注规范里完全没有覆盖这一项。策略由项目自定（用户已确认）：
+#   中文正文里、两侧都是中文的标点，一律用全角。
+# 例外与降级见下。
+# ---------------------------------------------------------------------------
+punctuation:
+  enabled: true
+  policy: 中文正文里、两侧都是中文的标点用全角
+  # 明确豁免，不报告
+  exempt:
+    - "引用标注 [数字]：规范要求半角中括号 + Times New Roman + 上标"
+    - "括号内含拉丁字母：英文缩写、单位、公式，如 (mg/g)、(RNA sequencing)"
+  # 单独列为“需人工判断”，不自动替换
+  low_confidence:
+    - "半角冒号：比例式（如 甲醛:乙酸:乙醇）中用半角是常见写法"
+  # 自动替换只做高置信度那一类
+  auto_fix: high_confidence_only
+
+# ---------------------------------------------------------------------------
+# 章节结构与检查项
+# ---------------------------------------------------------------------------
+required_sections:
+  - {key: abstract_cn,      label: 摘要,           style: abstract_title}
+  - {key: abstract_en,      label: ABSTRACT,       style: abstract_en_title}
+  - {key: toc,              label: 目录,           style: toc_title}
+  - {key: body_chapters,    label: 正文（绪论起）, style: heading1}
+  - {key: conclusion,       label: 结论,           style: heading1}
+  - {key: references,       label: 参考文献,       style: reference_title}
+  - {key: appendix_a,       label: 附录A,          style: appendix_title}
+  - {key: appendix_b,       label: 附录B,          style: appendix_title}
+  - {key: acknowledgment,   label: 致谢,           style: ack_title}
+
+word_count:
+  thesis_total: [30000, 80000]     # 硕士 3～8 万字
+  abstract_cn: 800                 # 左右
+  conclusion: 2000                 # 左右
+
+reference_count:
+  min: 80
+  foreign_min_ratio: 0.3333        # 外文文献一般应占三分之一
+
+# ---------------------------------------------------------------------------
+# 规范未明确规定、回退到 2025 年已通过答辩样本的项
+# ---------------------------------------------------------------------------
+fallback:
+  source: 某 2025 年答辩样本（学生真实论文，因隐私不随仓库分发）
+  note: 该样本为 2025 年 6 月论文，早于 2026-04-23 版模板，仅供参考；与规范冲突时以规范为准
+  items:
+    - key: heading1_number_style
+      issue: 规范只说"序号和标题间空 2 格"，未明说序号形式
+      template_instance: "1  绪论"          # 2026 模板正文实例，阿拉伯数字
+      sample_instance: "第一章 绪论"        # 2025 样本
+      decision: 采用模板实例（阿拉伯数字），但因涉及全书编号，需向学院确认
+    - key: cover_university_name
+      issue: 规范未规定封面校名用法
+      observed: 模板用"华文行楷"且字号不统一（7.5pt 与 36.5pt 混用）
+      decision: 照抄模板现状
+
+# ---------------------------------------------------------------------------
+# 规范里有、但本工具**尚未实现**的项目
+#
+# 为什么单列一节：这些条目还留在上面各自的位置（保持规范原文的完整），
+# 但它们从来没有被代码读过。混在生效的规则里，看规则的人会以为已经在查了——
+# 一次审查就是这么发现"脚注编号检查器报 warn、格式化器里根本没有写 footnotePr 的代码"的。
+# 报告与界面会把这一节原样列出来，说明"规范要求这些，但本工具不管"。
+#
+# 这一节是**可校验**的：tests/test_check.py 里有一条测试，把 check_docx.py 源码里
+# 所有传给 rep.add / check_dist 的分类名抠出来，逐个查 FIX_KIND，缺一个就失败。
+# 规则这一侧同理——tests/test_rules.py 会检查每个叶子键要么被代码引用，
+# 要么出现在本节的 keys 里，所以列表不会腐烂。
+#
+# 想实现哪一条，就把它从这里删掉，再去 check_docx / formatter 里接上。
+# ---------------------------------------------------------------------------
+not_implemented:
+  keys:
+    # ---- 数量类 ----
+    - key: reference_count.min
+      desc: 参考文献不少于 80 篇
+      why: 没做参考文献数量统计
+    - key: reference_count.foreign_min_ratio
+      desc: 外文文献一般应占三分之一
+      why: 要先能判中外文文献，规则没定
+    - key: word_count.abstract_cn
+      desc: 中文摘要 800 字左右
+      why: 现在只查正文总字数
+    - key: word_count.conclusion
+      desc: 结论 2000 字左右
+      why: 同上；结论段落要先能可靠切出来
+    # ---- 页码的外观（位置/字体用了哪条，编码见 formatter.plan_numbering）----
+    - key: pagination.position
+      desc: 页码在页脚居中
+      why: 页脚内容在 footer1.xml 里，还没解析
+    - key: pagination.font_en
+      desc: 页码用 Times New Roman
+      why: 同上
+    - key: pagination.size_pt
+      desc: 页码小五（9pt）
+      why: 同上
+    - key: pagination.decorate
+      desc: 页码两侧不加修饰线
+      why: 同上
+    # ---- 整块没做的 ----
+    - key: styles.cover_*
+      desc: 封面全部字段（分类号/密级、学校代号/学号、题目、副标题、作者导师、日期、英文题目）
+      why: 整块没做。分类器把封面区标成 cover 之后就不再处理
+    - key: styles.citation.*
+      desc: 引用标注用半角中括号 [n]、Times New Roman、上标
+      why: 这些字落在 Zotero 引用域里，域内内容一律不改
+    - key: styles.equation.*
+      desc: 公式分章编号、编号右对齐、加括号、1.5 倍行距
+      why: .docx 里公式多为 OMML 对象，没解析
+    - key: styles.subfigure.*
+      desc: 分图按 a) b) c) 编号，分图名在分图下方、主图名在所有分图下方
+      why: 要判断图片与题注的相邻关系，还没有这层逻辑
+    - key: styles.toc_common.*
+      desc: 目录页码右对齐、点前导符
+      why: 目录条目由 TOC 域生成，改了会被覆盖，整类跳过
+    - key: styles.toc_title.max_depth
+      desc: 目录只列到三级
+      why: 要能读 TOC 域的开关参数
+    # ---- 一类一类的 ----
+    - key: styles.*.new_page
+      desc: 各章节标题/摘要/ABSTRACT/参考文献/致谢/附录另起一页
+      why: 分页效果要渲染后才能判断，.docx 里没有分页信息
+    - key: styles.*.blank_line_after
+      desc: 标题、摘要标题、参考文献标题后空一行
+      why: 空行靠段落判定，规则里没定义"空行"怎么算
+    - key: styles.*.blank_line_before
+      desc: 关键词行前空一行
+      why: 同上
+    - key: styles.*.number_gap
+      desc: 一级标题序号与标题之间空 2 格
+      why: 涉及全书编号形式（见 fallback），要先向学院确认
+    - key: styles.*.number_style
+      desc: 一级标题序号用阿拉伯数字（理工科）
+      why: 同上，属"改内容"而非"改格式"
+    - key: styles.table_continued.format
+      desc: 续表重复表编号并重复表头
+      why: 需要跨页信息，.docx 里没有
+    - key: styles.*.numbering
+      desc: 图表按章编号（图1.1 / 表2.2）
+      why: 检查器按这个格式写死了正则，规则值本身没读
+    - key: styles.*.label_font
+      desc: "「关键词：」「Keywords:」这几个字用黑体"
+      why: 标签与内容在同一个 run 里，要拆字才做得到，而拆 run 有风险
+    - key: styles.*.label_bold
+      desc: "「Keywords:」加粗"
+      why: 同 label_font
+    - key: styles.*.separator
+      desc: 关键词之间用全角分号（英文摘要用半角）
+      why: 检查器只查了"最后一个词后不该有标点"
+    - key: styles.reference_item.indent.hanging
+      desc: 参考文献不悬挂缩进
+      why: 检查器只查了首行缩进与左缩进，没查悬挂
+    - key: styles.reference_item.gap_after_number
+      desc: 参考文献编号与内容之间空 1 格
+      why: 参考文献列表在 Zotero 书目域里，域内不改
