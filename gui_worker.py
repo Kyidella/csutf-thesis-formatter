@@ -18,53 +18,16 @@ import os
 import sys
 import tempfile
 import traceback
-import zipfile
 from dataclasses import dataclass, field
 from pathlib import Path
 
 from PySide6.QtCore import QThread, Signal
 
 import yaml
-from lxml import etree
 
-from check_docx import not_implemented_items, run_check
+from check_docx import (OutputPathError, friendly_error,
+                        not_implemented_items, run_check)
 from formatter import apply
-
-
-# --------------------------------------------------------------------------
-# 异常 → 人能看懂的中文
-# --------------------------------------------------------------------------
-# 顺序重要：先匹配子类/更具体的。KeyError 放在最后面之前，
-# 因为 zipfile 读不到部件时抛的就是 KeyError。
-ERROR_MESSAGES = [
-    (zipfile.BadZipFile, "这不是有效的 .docx 文件（可能是 .doc，或者文件已损坏）"),
-    (FileNotFoundError, "找不到文件，可能已被移动或删除"),
-    (PermissionError, "文件被 WPS / Word 占用，请先关掉再试"),
-    (etree.XMLSyntaxError, "文档内部的 XML 损坏，解析不了"),
-    (yaml.YAMLError, "规则文件格式有误"),
-    (KeyError, "文档里缺少必要的部件（如 word/document.xml），可能不是 Word 生成的文档"),
-    (ValueError, "参数不对——最常见的是输出路径和原文件相同"),
-    (TypeError, "规则文件内容类型不符（比如该是数字的地方写了文字）"),
-    (MemoryError, "文件太大，内存不够"),
-]
-
-
-class OutputPathError(Exception):
-    """输出路径本身有问题（目录不存在、没权限之类）。
-
-    单独一类是因为默认的 ValueError 提示语是"输出路径和原文件相同"，
-    套在别的路径问题上会把人带偏。
-    """
-
-
-def friendly_error(exc):
-    """把异常翻成中文。返回 (异常类名, 提示语)。"""
-    if isinstance(exc, OutputPathError):
-        return type(exc).__name__, str(exc)
-    for cls, msg in ERROR_MESSAGES:
-        if isinstance(exc, cls):
-            return type(exc).__name__, msg
-    return type(exc).__name__, f"出错了：{exc}"
 
 
 # --------------------------------------------------------------------------

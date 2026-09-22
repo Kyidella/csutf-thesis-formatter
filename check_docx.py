@@ -10,13 +10,76 @@
 import argparse
 import re
 import sys
+import zipfile
 from collections import Counter
 
 import yaml
+from lxml import etree
 
 from classifier import NUM_PATTERNS, classify
 from docmodel import has_drawing, load, stage
 from textfix import caption_gap_pos, punct_fixes
+
+
+# --------------------------------------------------------------------------
+# 异常 → 人能看懂的中文
+# --------------------------------------------------------------------------
+# 界面和两个命令行入口共用这一份。放在这里而不是 gui_worker，是因为
+# gui_worker 依赖 Qt（QThread），核心层不能反过来引它——而命令行也要说人话。
+# 翻译逻辑只有一份，就不会出现"界面说得好好的、命令行甩 traceback"。
+#
+# 顺序重要：先匹配子类/更具体的。KeyError 放在最后面之前，
+# 因为 zipfile 读不到部件时抛的就是 KeyError。
+ERROR_MESSAGES = [
+    (zipfile.BadZipFile, "这不是有效的 .docx 文件（可能是 .doc，或者文件已损坏）"),
+    (FileNotFoundError, "找不到文件，可能已被移动或删除"),
+    (PermissionError, "文件被 WPS / Word 占用，请先关掉再试"),
+    (etree.XMLSyntaxError, "文档内部的 XML 损坏，解析不了"),
+    (yaml.YAMLError, "规则文件格式有误"),
+    (KeyError, "文档里缺少必要的部件（如 word/document.xml），可能不是 Word 生成的文档"),
+    (ValueError, "参数不对——最常见的是输出路径和原文件相同"),
+    (TypeError, "规则文件内容类型不符（比如该是数字的地方写了文字）"),
+    (MemoryError, "文件太大，内存不够"),
+]
+
+
+class OutputPathError(Exception):
+    """输出路径本身有问题（目录不存在、没权限之类）。
+
+    单独一类是因为默认的 ValueError 提示语是"输出路径和原文件相同"，
+    套在别的路径问题上会把人带偏。
+    """
+
+
+def friendly_error(exc):
+    """把异常翻成中文。返回 (异常类名, 提示语)。"""
+    if isinstance(exc, OutputPathError):
+        return type(exc).__name__, str(exc)
+    for cls, msg in ERROR_MESSAGES:
+        if isinstance(exc, cls):
+            return type(exc).__name__, msg
+    return type(exc).__name__, f"出错了：{exc}"
+
+
+def known_error(exc):
+    """这个异常认得吗？
+
+    命令行靠它决定要不要把 traceback 亮出来：认得的翻成中文，不认得的原样抛
+    ——那才是真出了 bug，把 traceback 藏掉反而没法排查。
+    """
+    return isinstance(exc, OutputPathError) or any(
+        isinstance(exc, cls) for cls, _ in ERROR_MESSAGES)
+
+
+def cli_guard(fn):
+    """命令行入口的收尾。用法：`cli_guard(main)`。"""
+    try:
+        return fn()
+    except Exception as exc:                       # noqa: BLE001
+        if not known_error(exc):
+            raise
+        sys.exit(f"错误：{friendly_error(exc)[1]}")
+
 
 # --------------------------------------------------------------------------
 # 报告
@@ -105,20 +168,36 @@ FIX_KIND = {
 FIXABLE_LABEL = "支持自动排版"
 MANUAL_LABEL = "建议手动修改"
 
+# 规则键级别的例外：分类上"能自动修"，落在这些章节上也不行。
+# 目录条目由 TOC 域生成，改 pStyle 会在刷新目录时被 Word 覆盖，
+# 所以格式化器只报不改（见 formatter 里跳过它们的说明）。
+#
+# 为什么不能只按分类判：分类的粒度是「字号」「对齐」，同是「字号」，
+# 正文标题修得了、目录条目修不了。只看分类会标成"支持自动排版"，
+# 用户点了自动排版却发现目录纹丝不动——报告等于在承诺工具不会做的事。
+# 格式化器直接引用这个集合，两边不可能各说各话。
+SKIP_FIX_KEYS = {"toc_entry_front", "toc_entry_1", "toc_entry_2", "toc_entry_3"}
 
-def fix_hint(category):
+
+def fix_kind(category, key=None):
+    """内部层次（文档级/样式级/文本级），给悬停提示用；不自动修返回 None。
+
+    key 是该条问题对应的规则键（如 toc_entry_2）。同一个分类落在不同章节上，
+    能不能自动修未必一样，所以要看键，不能只看分类。
+    """
+    if key in SKIP_FIX_KEYS:
+        return None
+    return FIX_KIND.get(category)
+
+
+def fix_hint(category, key=None):
     """报告里那条问题后面跟的标记。
 
     给用户看的只有两种说法：工具会不会自己处理。
     FIX_KIND 里那个"文档级/样式级/文本级"是内部实现分层，对用户没意义，
     所以只放进界面的悬停提示（见 fix_kind），不印在报告上。
     """
-    return f"　`{FIXABLE_LABEL}`" if FIX_KIND.get(category) else f"　`{MANUAL_LABEL}`"
-
-
-def fix_kind(category):
-    """内部层次（文档级/样式级/文本级），给悬停提示用；不自动修返回 None。"""
-    return FIX_KIND.get(category)
+    return f"　`{FIXABLE_LABEL}`" if fix_kind(category, key) else f"　`{MANUAL_LABEL}`"
 
 
 def para_loc(p, n=28):
@@ -630,7 +709,7 @@ def write_report(rep, doc, rows, input_path, rules, rules_path, report_path):
         for it in pri:
             lines.append(f"- **[{tag[it['level']]}] {it['category']}** — {it['msg']}"
                          + (f"  `{it['loc']}`" if it["loc"] else "")
-                         + fix_hint(it["category"]))
+                         + fix_hint(it["category"], it.get("key")))
     else:
         lines.append("- （无）")
 
@@ -638,7 +717,8 @@ def write_report(rep, doc, rows, input_path, rules, rules_path, report_path):
     for it in rep.items:
         lines.append(f"- **[{tag[it['level']]}] {it['category']}** — {it['msg']}"
                      + (f"  `{it['loc']}`" if it["loc"] else "")
-                     + (fix_hint(it["category"]) if it["level"] != "info" else ""))
+                     + (fix_hint(it["category"], it.get("key"))
+                        if it["level"] != "info" else ""))
 
     counts = Counter(r.key for r in rows)
     lines += ["", "## 文档概况", ""]
@@ -688,4 +768,4 @@ def main():
 
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")
-    main()
+    cli_guard(main)

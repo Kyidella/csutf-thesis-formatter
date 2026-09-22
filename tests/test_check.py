@@ -6,8 +6,9 @@
 import pytest
 import yaml
 
-from check_docx import (FIXABLE_LABEL, FIX_KIND, MANUAL_LABEL, classify_punct,
-                        fix_hint, fix_kind, run_check)
+from check_docx import (FIXABLE_LABEL, FIX_KIND, MANUAL_LABEL, SKIP_FIX_KEYS,
+                        classify_punct, cli_guard, fix_hint, fix_kind,
+                        known_error, run_check)
 from conftest import RULES, build_docx
 
 pytestmark = pytest.mark.skipif(not RULES.exists(), reason="规则文件缺失")
@@ -246,6 +247,65 @@ def test_能自动修的标出层级_不能的标需人工():
     assert MANUAL_LABEL in fix_hint("脚注"), "脚注排版器确实不处理，必须标出来"
     assert MANUAL_LABEL in fix_hint("缺失章节")
     assert MANUAL_LABEL in fix_hint("某个还没实现的新分类"), "没登记的按保守处理"
+
+
+def test_目录条目即便分类能修也要标需人工():
+    """目录条目由 TOC 域生成，改了会被刷新覆盖，格式化器故意跳过。
+
+    它是「字号」「对齐」这些能自动修的分类，只看分类会标成"支持自动排版"，
+    用户点了自动排版却什么也没变——报告等于承诺了工具不会做的事。
+    所以判定必须落到规则键上。这是拿真论文跑出来的：某样本论文排版完，
+    剩下的警告几乎全是目录项，且全被标成了"支持自动排版"。
+    """
+    assert fix_kind("字号", "toc_entry_2") is None, "目录条目的字号修不了"
+    assert MANUAL_LABEL in fix_hint("字号", "toc_entry_2")
+    assert fix_kind("左缩进", "toc_entry_2") is None
+    assert fix_kind("行距", "toc_entry_1") is None
+
+    # 同一个分类落在正文标题上就是能修的——差别只在键
+    assert fix_kind("字号", "heading2") == "样式级"
+    assert FIXABLE_LABEL in fix_hint("字号", "heading2")
+
+    # 少了键也不能反过来变宽松：目录条目的样式键都必须在跳过名单里
+    assert {"toc_entry_front", "toc_entry_1", "toc_entry_2", "toc_entry_3"} \
+        == SKIP_FIX_KEYS
+
+
+def test_排版器跳过的目录条目名单和检查器是同一份():
+    """两处各写一份名单，早晚会漂移——报告说能修、排版器说我不修。
+
+    格式化器直接引用 check_docx 的常量，这条测试盯住这个引用别被改回去。
+    """
+    import formatter
+
+    assert formatter.SKIP_FIX_KEYS is SKIP_FIX_KEYS
+
+
+def test_命令行把认得的异常翻成中文_认不出的照旧traceback():
+    """.doc 走命令行曾经直接甩 zipfile 的 traceback，界面里却是人话。
+
+    现在两边共用一张表：认得的翻成中文退出；认不出的原样抛——那才是真出了
+    bug，把 traceback 藏掉反而没法排查。
+    """
+    import zipfile
+
+    def 打开一个doc():
+        raise zipfile.BadZipFile()
+
+    with pytest.raises(SystemExit) as e:
+        cli_guard(打开一个doc)
+    assert ".docx" in str(e.value), "要告诉用户这可能是 .doc"
+    assert "Traceback" not in str(e.value)
+
+    def 真出了bug():
+        raise RuntimeError("没见过这种")
+
+    with pytest.raises(RuntimeError):
+        cli_guard(真出了bug)          # 不认得的异常不该被吞掉
+
+    assert known_error(zipfile.BadZipFile())
+    assert known_error(FileNotFoundError())
+    assert not known_error(RuntimeError("没见过这种"))
 
 
 def test_报告里带上了能不能自动修的标记(tmp_path, rules):

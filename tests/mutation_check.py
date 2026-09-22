@@ -40,6 +40,9 @@ MUTATIONS = [
      "if False:", "不再检查西文字体"),
     ("check_docx.py", 'elif i["level"] == "warn" and i.get("ok") == 0:',
      "elif False:", "优先区不捞「整体不符规范」的条目"),
+    ("check_docx.py", "if key in SKIP_FIX_KEYS:\n        return None",
+     "if False:\n        return None",
+     "报告把排版器不碰的目录条目也说成能自动修"),
     ("check_docx.py", "if not p.text.strip():\n            continue",
      "if False:\n            continue", "空段也计入格式统计"),
     ("check_docx.py", 'if not cfg.get("enabled"):', "if True:",
@@ -62,7 +65,7 @@ MUTATIONS = [
     ("formatter.py", "if fm <= sec.index < body:", "if fm <= sec.index <= body:",
      "正文起页边界差一节"),
     ("formatter.py", 'if p.has_field:', 'if False:', "段落映射不再跳过引用域段落"),
-    ("formatter.py", 'if key in SKIP_STYLE_KEYS:', 'if False:', "段落映射不再跳过目录条目"),
+    ("formatter.py", 'if key in SKIP_FIX_KEYS:', 'if False:', "段落映射不再跳过目录条目"),
     ("formatter.py",
      'for tag in RPR_STRIP:\n            node = rpr.find(f"{W}{tag}")\n'
      "            if node is not None:\n                rpr.remove(node)\n"

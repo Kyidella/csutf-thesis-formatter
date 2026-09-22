@@ -400,7 +400,7 @@ class MainWindow(QMainWindow):
 
     def _row(self, it):
         label, color = LEVEL_STYLE.get(it["level"], ("", "#000000"))
-        kind = fix_kind(it["category"])
+        kind = fix_kind(it["category"], it.get("key"))
         hint = FIXABLE_LABEL if kind else MANUAL_LABEL
         row = QTreeWidgetItem([label, it["category"], it["msg"], it["loc"], hint])
         row.setForeground(0, QColor(color))
@@ -409,6 +409,8 @@ class MainWindow(QMainWindow):
         row.setToolTip(3, it["loc"])
         row.setToolTip(4, f"工具会自动处理（{kind}）" if kind
                            else "工具不会自动改，需要你自己处理")
+        # 能不能自动修要看规则键，从这列的文字（分类）反推不出来，存下来给筛选用。
+        row.setData(4, Qt.UserRole, bool(kind))
         return row
 
     def _apply_filter(self, *_):
@@ -429,7 +431,7 @@ class MainWindow(QMainWindow):
                 hit = (not text) or any(
                     text in child.text(c) for c in range(5))
                 if hit and want is not None:
-                    hit = (fix_kind(child.text(1)) is not None) == want
+                    hit = bool(child.data(4, Qt.UserRole)) == want
                 child.setHidden(not hit)
                 shown += hit
             parent.setHidden(shown == 0)

@@ -31,7 +31,7 @@ from pathlib import Path
 from lxml import etree
 
 from classifier import classify
-from check_docx import missing_sections
+from check_docx import SKIP_FIX_KEYS, cli_guard, missing_sections
 from docmodel import (TWIPS_PER_CM, has_drawing, has_inline_drawing,
                       load, stage)
 from textfix import fix_text
@@ -226,8 +226,8 @@ def fix_numbering(doc, rows, rules, changes, notes):
 # 段落映射到样式
 # --------------------------------------------------------------------------
 # 目录条目由 TOC 域生成，样式由 Word 自己套（toc 1/2/3）；
-# 我们改 pStyle 会在刷新目录时被覆盖，所以跳过。
-SKIP_STYLE_KEYS = {"toc_entry_front", "toc_entry_1", "toc_entry_2", "toc_entry_3"}
+# 我们改 pStyle 会在刷新目录时被覆盖，所以跳过。名单在 check_docx 里
+# ——检查报告要按同一个名单说"建议手动修改"，两处共用一份，免得各说各话。
 
 # 与目标样式冲突的直接格式：清掉它们，样式才能生效。
 # 只清我们管的这几项——加粗、斜体、上下标等有语义的格式一律不动。
@@ -308,7 +308,7 @@ def apply_paragraph_styles(doc, rows, rules, style_map, changes, notes):
         if key not in style_map:
             continue
         p = r.para
-        if key in SKIP_STYLE_KEYS:
+        if key in SKIP_FIX_KEYS:
             stat["skip_toc"] += 1
             continue
         if p.has_field:
@@ -477,4 +477,4 @@ def main():
 
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")
-    main()
+    cli_guard(main)
