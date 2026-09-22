@@ -127,9 +127,9 @@ run 数 6284、`w:t` 数 5514 也不变，**而且只替换了 `word/document.xm
 
 代码用 **MIT**，见 [`LICENSE`](LICENSE)。
 
-打包出来的 exe 里还含第三方组件，其中 **Qt / PySide6 是 LGPLv3**——
-**发 exe 之前先看一眼 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)**，
-里面写了分发时必须满足的几条（最容易漏的是附上 LGPL 许可全文）。
+Releases 里的 exe 还打包了第三方组件，其中 **Qt / PySide6 是 LGPLv3**。
+这些组件的许可原文和署名都随包附上了，明细见
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)。
 
 ## 它凭什么值得信
 

@@ -75,6 +75,12 @@ QtCore/QtWidgets，双击起得来。
 
 **改了代码记得重新打包** —— `dist/` 在 `.gitignore` 里，Release 上的那个 exe 不会自己更新。
 
+**分发包里那三个许可文件别删。** `build_exe.py` 会自动把 `LICENSE`、
+`THIRD_PARTY_NOTICES.md`、`LICENSE-LGPLv3.txt` 一起塞进去（见 `LEGAL_FILES`）——
+因为 exe 里打包了 Qt / PySide6，它们是 **LGPLv3**，分发时必须附上许可全文。
+看着像杂物，其实是义务；少了就是许可不合规。明细见
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)。
+
 ## 测试
 
 ```bash
