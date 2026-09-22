@@ -51,7 +51,11 @@ python formatter.py 论文.docx --rules rules/xxx.yaml --output 修正后.docx -
 python formatter.py 论文.docx --rules rules/xxx.yaml --output 修正后.docx
 ```
 
-不想装 Python 也没关系，Releases 里有打包好的 exe 和免安装版，解压就能用。
+不想装 Python 也没关系，Releases 里有两个文件：
+
+- **`ThesisFormatter.exe`** —— 双击就能用，最省事
+- **`ThesisFormatter-portable.zip`** —— 解压后双击里面的 exe。它不往临时目录写东西，
+  也不容易被杀软误报
 
 ## 它会替你盯着这些
 

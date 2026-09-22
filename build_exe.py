@@ -134,7 +134,10 @@ def build_onedir():
     if not folder.exists():
         sys.exit("没看到 onedir 产物")
     _copy_legal(folder)
-    zip_base = ROOT / "dist" / f"{NAME}-免安装版"
+    # zip 名必须是纯 ASCII。GitHub 的 Release 附件会丢掉文件名里的非 ASCII 字符——
+    # 实测 "ThesisFormatter-免安装版.zip" 传上去变成了 "ThesisFormatter-.zip"（一个光秃秃的
+    # 连字符），用户根本看不出那是什么。所以这里叫 portable，别改回中文。
+    zip_base = ROOT / "dist" / f"{NAME}-portable"
     out = shutil.make_archive(str(zip_base), "zip",
                               root_dir=folder.parent, base_dir=NAME)
     mb = Path(out).stat().st_size / (1024 ** 2)
